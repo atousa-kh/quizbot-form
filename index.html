@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Poll</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f9f9f9;
+      padding: 20px;
+      margin: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 450px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      color: #000;
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: right;
+    }
+    label {
+      display: block;
+      color: #007aff;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 16px;
+    }
+    .option-input {
+      margin-bottom: 8px;
+    }
+    .checkbox {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .checkbox input {
+      margin-left: 8px;
+    }
+    button {
+      padding: 10px 16px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .add-option {
+      background-color: #eee;
+      color: #333;
+      margin-bottom: 16px;
+    }
+    .submit-btn {
+      background-color: #007aff;
+      color: white;
+      width: 100%;
+    }
+    .cancel-btn {
+      background-color: #ccc;
+      margin-top: 8px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🆕 New poll</h2>
+    <form id="pollForm">
+      <label for="question">Question</label>
+      <input type="text" id="question" name="question" placeholder="Ask a question..." required />
+
+      <label>Poll options</label>
+      <div id="options">
+        <input type="text" class="option-input" placeholder="Add an option..." required />
+        <input type="text" class="option-input" placeholder="Add an option..." />
+      </div>
+      <button type="button" class="add-option" onclick="addOption()">➕ Add Option</button>
+
+      <label>Settings</label>
+      <div class="checkbox">
+        <input type="checkbox" id="anonymous" checked />
+        <label for="anonymous">Anonymous Voting</label>
+      </div>
+      <div class="checkbox">
+        <input type="checkbox" id="quizmode" />
+        <label for="quizmode">Quiz Mode</label>
+      </div>
+
+      <label for="explanation">Explanation</label>
+      <textarea id="explanation" placeholder="Add a comment (optional)..."></textarea>
+
+      <button type="submit" class="submit-btn">Create</button>
+      <button type="button" class="cancel-btn" onclick="Telegram.WebApp.close()">Cancel</button>
+    </form>
+  </div>
+
+  <script>
+    function addOption() {
+      const optionsDiv = document.getElementById("options");
+      const inputs = optionsDiv.getElementsByClassName("option-input");
+      if (inputs.length >= 10) {
+        alert("You can only add up to 10 options.");
+        return;
+      }
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Add an option...";
+      input.className = "option-input";
+      optionsDiv.appendChild(input);
+    }
+
+    const form = document.getElementById("pollForm");
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const question = document.getElementById("question").value;
+      const options = Array.from(document.getElementsByClassName("option-input"))
+        .map(input => input.value)
+        .filter(opt => opt.trim() !== "");
+
+      const anonymous = document.getElementById("anonymous").checked;
+      const quizmode = document.getElementById("quizmode").checked;
+      const explanation = document.getElementById("explanation").value;
+
+      const pollData = {
+        question,
+        options,
+        anonymous,
+        quizmode,
+        explanation
+      };
+
+      if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.sendData(JSON.stringify(pollData));
+        Telegram.WebApp.close();
+      } else {
+        alert("Telegram WebApp not available");
+      }
+    });
+  </script>
+</body>
+</html>
